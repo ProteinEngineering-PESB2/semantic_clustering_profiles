@@ -2,16 +2,17 @@ from sklearn import metrics
 
 class evaluationClustering(object):
 
-    def __init__(self, dataSet, labelsResponse):
+    def get_metrics(self, dataSet, labelsResponse):
 
-        self.dataSet = dataSet
-        self.labelsResponse = labelsResponse
         try:
-            self.calinski = metrics.calinski_harabasz_score(self.dataSet, self.labelsResponse)
-            self.siluetas = metrics.silhouette_score(self.dataSet, self.labelsResponse, metric='euclidean')
-            self.davies = metrics.davies_bouldin_score(self.dataSet, self.labelsResponse)
+            calinski = metrics.calinski_harabasz_score(dataSet, labelsResponse)
+            siluetas = metrics.silhouette_score(dataSet, labelsResponse, metric='euclidean')
+            davies = metrics.davies_bouldin_score(dataSet, labelsResponse)
+            response = [calinski, siluetas, davies]
         except:
-            self.calinski = "ERROR"
-            self.siluetas = "ERROR"
-            self.davies = "ERROR"
+            calinski = "ERROR"
+            siluetas = "ERROR"
+            davies = "ERROR"
+            response = [calinski, siluetas, davies]
             pass
+        return response
