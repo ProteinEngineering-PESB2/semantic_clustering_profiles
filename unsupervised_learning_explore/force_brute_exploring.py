@@ -2,6 +2,7 @@ import classical_ml_clustering
 import evaluation_cluster
 import pandas as pd
 import random
+import clustering_model
 
 class exploring_clustering(object):
 
@@ -14,18 +15,25 @@ class exploring_clustering(object):
         self.max_examples_per_group = max_examples_per_group
         self.exploring_instance = classical_ml_clustering.aplicateClustering(self.dataset)
         self.eval_performances = evaluation_cluster.evaluationClustering()
+        self.explore_models = []
 
     def __evaluate_algorithm(self, algorithm, response, params, model_instance):
 
         if response == 0:
             performances = self.eval_performances.get_metrics(model_instance.dataSet,
                                                               model_instance.labels)
-            row = [algorithm, params, model_instance.number_groups, performances[0], performances[1], performances[2]]
-            self.explore_results.append(row)
+            if performances[0] != "ERROR" and performances[1] != "ERROR" and performances[2] != "ERROR":
+                #Adding to performances metrics list
+                row = [algorithm, params, model_instance.number_groups, performances[0], performances[1], performances[2]]
+                self.explore_results.append(row)
+
+                #Adding to developed models
+                developed_model = clustering_model.developed_model(model_instance.labels, model_instance.dataSet, params, algorithm, performances, 'PROCESSED')
+                self.explore_models.append(developed_model)
 
     def __exploring_with_k_params(self):
 
-        for k in range(1, self.max_k_values+1):
+        for k in range(2, self.max_k_values+1):
             response_apply = self.exploring_instance.aplicateKMeans(k)
             self.__evaluate_algorithm("KMEANS", response_apply, "k={}".format(k), self.exploring_instance)
 
@@ -81,9 +89,10 @@ class exploring_clustering(object):
         self.__exploring_agglomerative_ks()
 
         #exploring optics clustering
-        print("Exploring Optic clustering")
-        self.__exploring_optics()
+        #print("Exploring Optic clustering")
+        #self.__exploring_optics()
 
         print("Exporting results")
         self.__export_results()
 
+        print(len(self.explore_models))
