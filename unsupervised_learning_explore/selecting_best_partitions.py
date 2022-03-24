@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 class selection_process(object):
 
@@ -10,6 +9,7 @@ class selection_process(object):
         self.list_models = list_models
         self.decision_quartile = decision_quartile
         self.point_criterion = point_criterion
+        self.selected_partitions = None
 
     def get_statistics_values_by_performance(self, list_metrics):
 
@@ -45,13 +45,13 @@ class selection_process(object):
         z_score_negative = np.mean(list_value) - (np.std(list_value) * self.point_criterion)
         return [z_score_negative, z_score_positive]
 
-    def __make_positive_selection(self, z_score, q_vale, list_values):
+    def __make_positive_selection(self, z_score, q_value, list_values):
         select_examples = []
 
         for i in range(len(self.explore_df)):
             row_response = []
 
-            if list_values[i] >= q_vale:
+            if list_values[i] >= q_value:
                 row_response.append(1)
             else:
                 row_response.append(0)
@@ -64,14 +64,101 @@ class selection_process(object):
             select_examples.append(sum(row_response))
         return select_examples
 
+    def __make_negative_selection(self, z_score, q_value, list_values):
+        select_examples = []
+
+        for i in range(len(self.explore_df)):
+            row_response = []
+
+            if list_values[i] <= q_value:
+                row_response.append(1)
+            else:
+                row_response.append(0)
+
+            if list_values[i] <= z_score:
+                row_response.append(1)
+            else:
+                row_response.append(0)
+
+            select_examples.append(sum(row_response))
+        return select_examples
+
     def select_best_calinski_siluetas(self, performance):
 
         quartiles_values = self.__estimated_interquartile(self.explore_df[performance])
         z_score = self.__estimated_z_score(self.explore_df[performance])
-        self.explore_df["selected_{}".format(performance)] = self.__make_positive_selection(z_score[1], quartiles_values[1], self.explore_df[performance])
+        self.explore_df["selected_{}".format(performance)] = self.__make_positive_selection(z_score[1],
+                                                                                            quartiles_values[1],
+                                                                                            self.explore_df[
+                                                                                                performance])
 
     def select_best_davis(self, performance):
 
+        quartiles_values = self.__estimated_interquartile(self.explore_df[performance])
+        z_score = self.__estimated_z_score(self.explore_df[performance])
+        self.explore_df["selected_{}".format(performance)] = self.__make_negative_selection(z_score[0],
+                                                                                            quartiles_values[0],
+                                                                                            self.explore_df[
+                                                                                                performance])
 
+    def __update_decision(self, performance_name, criterion, value):
 
+        list_values = []
+        for i in range(len(self.explore_df)):
+            if criterion == 1:  # higher
+                if self.explore_df[performance_name][i] >= value:
+                    list_values.append(3)
+                else:
+                    list_values.append(0)
+            else:  # lower
+                if self.explore_df[performance_name][i] <= value:
+                    list_values.append(3)
+                else:
+                    list_values.append(0)
+        # updating
+        self.explore_df["selected_{}".format(performance_name)] = list_values
 
+    def evaluate_selection_process(self, performance_list):
+
+        for performance in performance_list:
+            key = "selected_{}".format(performance)
+            df_summary = self.explore_df.loc[self.explore_df[key] > 0]
+            if len(df_summary) <= 0:
+                if "cal" in performance or "sil" in performance:
+                    max_value = np.max(self.explore_df[performance])
+                    self.__update_decision(performance, 1, max_value)
+                else:
+                    min_value = np.min(self.explore_df[performance])
+                    self.__update_decision(performance, 0, min_value)
+
+    def __create_index_account(self, list_index):
+
+        index_values = []
+        for indexes in list_index:
+            values = [index for index in indexes]
+            index_values+=values
+
+        index_values = list(set(index_values))
+        return index_values
+
+    def select_partitions_by_performances(self, performance_list):
+
+        index_list = []
+        for performance in performance_list:
+            key = "selected_{}".format(performance)
+            df_selected = self.explore_df.loc[self.explore_df[key] != 0]
+            index_list.append(df_selected.index)
+
+        index_to_process = self.__create_index_account(index_list)
+
+        matrix_data = []
+
+        for index in index_to_process:
+            row = [self.explore_df[key][index] for key in self.explore_df.columns]
+            matrix_data.append(row)
+
+        self.selected_partitions = pd.DataFrame(matrix_data, columns=self.explore_df.columns)
+        try:
+            self.selected_partitions.drop(columns=['Unnamed: 0'], inplace=True)
+        except:
+            pass
