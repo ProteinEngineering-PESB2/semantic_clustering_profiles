@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import random
 
 class selection_process(object):
 
@@ -141,7 +142,7 @@ class selection_process(object):
         index_values = list(set(index_values))
         return index_values
 
-    def select_partitions_by_performances(self, performance_list):
+    def select_partitions_by_performances(self, performance_list, path_export):
 
         index_list = []
         for performance in performance_list:
@@ -162,3 +163,8 @@ class selection_process(object):
             self.selected_partitions.drop(columns=['Unnamed: 0'], inplace=True)
         except:
             pass
+
+        print("Exporting select partitions")
+        name_export = "{}selected_partition_process_{}.csv".format(path_export, random.randint(1, 100)*100)
+        print(name_export)
+        self.selected_partitions.to_csv(name_export, index=False)

@@ -2,7 +2,6 @@ import classical_ml_clustering
 import evaluation_cluster
 import pandas as pd
 import random
-import clustering_model
 
 class exploring_clustering(object):
 
@@ -15,7 +14,7 @@ class exploring_clustering(object):
         self.max_examples_per_group = max_examples_per_group
         self.exploring_instance = classical_ml_clustering.aplicateClustering(self.dataset)
         self.eval_performances = evaluation_cluster.evaluationClustering()
-        self.explore_models = []
+        self.df_with_labels = pd.DataFrame()
 
     def __evaluate_algorithm(self, algorithm, response, params, model_instance):
 
@@ -24,12 +23,11 @@ class exploring_clustering(object):
                                                               model_instance.labels)
             if performances[0] != "ERROR" and performances[1] != "ERROR" and performances[2] != "ERROR":
                 #Adding to performances metrics list
-                row = [algorithm, params, model_instance.number_groups, performances[0], performances[1], performances[2]]
+                random_data = random.randint(1, 1000)*100
+                iteration = "process_{}".format(random_data)
+                row = [iteration, algorithm, params, model_instance.number_groups, performances[0], performances[1], performances[2]]
+                self.df_with_labels[iteration] = model_instance.labels
                 self.explore_results.append(row)
-
-                #Adding to developed models
-                developed_model = clustering_model.developed_model(model_instance.labels, model_instance.dataSet, params, algorithm, performances, 'PROCESSED')
-                self.explore_models.append(developed_model)
 
     def __exploring_with_k_params(self):
 
@@ -59,9 +57,16 @@ class exploring_clustering(object):
                     self.__evaluate_algorithm("OPTICS", response_apply, params, self.exploring_instance)
 
     def __export_results(self):
-        df_export = pd.DataFrame(self.explore_results, columns=["algorithm", "params", "generated_groups", "calinski_haraabasz", "siluetas", "davis"])
-        name_export = "exploring_result_{}.csv".format(random.randint(1, 10000)*100)
-        df_export.to_csv(self.path_export+name_export)
+        print("Exporting results")
+        random_data = random.randint(1, 10000) * 100
+        df_export = pd.DataFrame(self.explore_results, columns=["iteration", "algorithm", "params", "generated_groups", "calinski_haraabasz", "siluetas", "davis"])
+        name_export = "exploring_result_{}.csv".format(random_data)
+        print(name_export)
+        df_export.to_csv(self.path_export+name_export, index=False)
+
+        name_export = "df_with_labels_{}.csv".format(random_data)
+        print(name_export)
+        self.dataset.to_csv(self.path_export + name_export, index=False)
 
     def start_exploring(self):
 
@@ -86,7 +91,7 @@ class exploring_clustering(object):
 
         #exploring agglomerative clustering
         print("Exploring agglomerative")
-        self.__exploring_agglomerative_ks()
+        #self.__exploring_agglomerative_ks()
 
         #exploring optics clustering
         #print("Exploring Optic clustering")
@@ -94,5 +99,3 @@ class exploring_clustering(object):
 
         print("Exporting results")
         self.__export_results()
-
-        print(len(self.explore_models))
