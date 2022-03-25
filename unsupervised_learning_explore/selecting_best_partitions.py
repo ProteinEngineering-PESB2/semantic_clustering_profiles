@@ -35,7 +35,7 @@ class selection_process(object):
         q3_value = np.quantile(list_values, .75)
         interquartil = q3_value - q1_value
 
-        low_value = q3_value - (self.decision_quartile * interquartil)
+        low_value = q1 - (self.decision_quartile * interquartil)
         high_value = q3_value + (self.decision_quartile * interquartil)
 
         return [low_value, high_value]

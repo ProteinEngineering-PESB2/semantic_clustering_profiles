@@ -9,8 +9,6 @@ class estimated_distance(object):
     
     def __init__(self, dataset, name_output):
         self.dataset = dataset
-
-        #dataset = dataset[:10]
         self.name_output = name_output
 
         self.__start_variables()
@@ -40,7 +38,10 @@ class estimated_distance(object):
     def create_vector_values(self, dataset, index):
 
         #hacerlo con pandas para mas facilidad
-        row =  [dataset[value][index] for value in dataset.keys()]
+        row =  [dataset[value][index] for value in dataset.keys() if value != "id"]
+        id_value = dataset["id"][index]
+        row.insert(0, id_value)
+        
         return row
     
     def create_vector_values_multi(self, dataset, start, stop):
@@ -54,7 +55,9 @@ class estimated_distance(object):
     
     def estimated_distance(self, vector1, vector2):
 
-        distance_result = [distance.cityblock(vector1, vector2), distance.cosine(vector1, vector2), distance.correlation(vector1, vector2)]
+        id_1 = vector1[0]
+        id_2 = vector2[0]
+        distance_result = [id_1, id_2, distance.cityblock(vector1[1:], vector2[1:]), distance.cosine(vector1[1:], vector2[1:]), distance.correlation(vector1[1:], vector2[1:])]
         return distance_result
     
     def estimated_distance_multi(self, vector1, matrix_vector):
@@ -93,7 +96,7 @@ class estimated_distance(object):
 
         print(len(matrix_data))
 
-        data_export = pd.DataFrame(matrix_data, columns=["euclidean", "cosine", "correlation"])
+        data_export = pd.DataFrame(matrix_data, columns=["id_1", "id_2", "euclidean", "cosine", "correlation"])
         data_export.to_csv(self.name_output, index=False)
 
     def run_parallel(self):
