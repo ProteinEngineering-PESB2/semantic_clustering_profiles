@@ -35,7 +35,7 @@ class selection_process(object):
         q3_value = np.quantile(list_values, .75)
         interquartil = q3_value - q1_value
 
-        low_value = q1 - (self.decision_quartile * interquartil)
+        low_value = q1_value - (self.decision_quartile * interquartil)
         high_value = q3_value + (self.decision_quartile * interquartil)
 
         return [low_value, high_value]
@@ -125,6 +125,7 @@ class selection_process(object):
             key = "selected_{}".format(performance)
             df_summary = self.explore_df.loc[self.explore_df[key] > 0]
             if len(df_summary) <= 0:
+                print("Updating performances")
                 if "cal" in performance or "sil" in performance:
                     max_value = np.max(self.explore_df[performance])
                     self.__update_decision(performance, 1, max_value)

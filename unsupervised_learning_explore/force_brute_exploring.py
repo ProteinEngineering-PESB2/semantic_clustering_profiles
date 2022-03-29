@@ -5,7 +5,7 @@ import random
 
 class exploring_clustering(object):
 
-    def __init__(self, dataset, path_export, max_k_values, min_examples_per_group, max_examples_per_group):
+    def __init__(self, dataset, path_export, max_k_values, min_examples_per_group, max_examples_per_group, index_examples):
         self.dataset = dataset
         self.path_export = path_export
         self.explore_results = []
@@ -15,6 +15,8 @@ class exploring_clustering(object):
         self.exploring_instance = classical_ml_clustering.aplicateClustering(self.dataset)
         self.eval_performances = evaluation_cluster.evaluationClustering()
         self.df_with_labels = pd.DataFrame()
+        self.df_explore_to_export = None
+        self.index_examples = index_examples
 
     def __evaluate_algorithm(self, algorithm, response, params, model_instance):
 
@@ -49,24 +51,24 @@ class exploring_clustering(object):
 
     def __exploring_optics(self):
 
-        for min_members in range(1, 10):
-            for xi in [0, 0.01, 0.05, 0.1, 0.5, 1]:
-                for min_size in [0, 0.01, 0.05, 0.1, 0.5, 1]:
-                    params = "min_members: {}-xi: {}-min_size: {}".format(min_members, xi, min_size)
-                    response_apply = self.exploring_instance.applicateOptics(min_members, xi, min_size)
-                    self.__evaluate_algorithm("OPTICS", response_apply, params, self.exploring_instance)
+        for xi in [0, 0.01, 0.05, 0.1, 0.5, 1]:
+            for min_size in [0, 0.01, 0.05, 0.1, 0.5, 1]:
+                params = "min_members: {}-xi: {}-min_size: {}".format(self.min_examples_per_group, xi, min_size)
+                response_apply = self.exploring_instance.applicateOptics(self.min_examples_per_group, xi, min_size)
+                self.__evaluate_algorithm("OPTICS", response_apply, params, self.exploring_instance)
 
     def __export_results(self):
         print("Exporting results")
         random_data = random.randint(1, 10000) * 100
-        df_export = pd.DataFrame(self.explore_results, columns=["iteration", "algorithm", "params", "generated_groups", "calinski_haraabasz", "siluetas", "davis"])
+        self.df_explore_to_export = pd.DataFrame(self.explore_results, columns=["iteration", "algorithm", "params", "generated_groups", "calinski_haraabasz", "siluetas", "davis"])
         name_export = "exploring_result_{}.csv".format(random_data)
         print(name_export)
-        df_export.to_csv(self.path_export+name_export, index=False)
+        self.df_explore_to_export.to_csv(self.path_export+name_export, index=False)
 
         name_export = "df_with_labels_{}.csv".format(random_data)
         print(name_export)
-        self.dataset.to_csv(self.path_export + name_export, index=False)
+        self.df_with_labels['index_examples'] = self.index_examples
+        self.df_with_labels.to_csv(self.path_export + name_export, index=False)
 
     def start_exploring(self):
 
@@ -82,20 +84,21 @@ class exploring_clustering(object):
 
         #Affinity propagation
         print("Exploring AffinityPropagation")
-        response_apply = self.exploring_instance.aplicateAffinityPropagation()
+        #response_apply = self.exploring_instance.aplicateAffinityPropagation()
         self.__evaluate_algorithm("AffinityPropagation", response_apply, "", self.exploring_instance)
 
         #Apply k-means and birch
         print("Exploring k-means and birch")
         self.__exploring_with_k_params()
 
-        #exploring agglomerative clustering
-        print("Exploring agglomerative")
-        #self.__exploring_agglomerative_ks()
+        #Apply Agglommerative
+        print("Exploring Agglommerative")
+        self.__exploring_agglomerative_ks()
 
-        #exploring optics clustering
-        #print("Exploring Optic clustering")
-        #self.__exploring_optics()
+        #Apply optics
+        print("Exploring Optics")
+        self.__exploring_optics()
 
+        #Apply
         print("Exporting results")
         self.__export_results()
