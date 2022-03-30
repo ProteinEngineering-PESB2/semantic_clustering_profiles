@@ -7,7 +7,7 @@ dataset = pd.read_csv(sys.argv[1])
 path_export = sys.argv[2]
 
 #remove response
-dataset = dataset.drop(columns=['variety'])
+dataset = dataset.drop(columns=['paragraph'])
 
 dataset['id'] = [i+1 for i in range(len(dataset))]
 
