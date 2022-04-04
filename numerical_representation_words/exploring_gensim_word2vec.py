@@ -11,6 +11,7 @@ class training_autoencoders(object):
         self.min_alpha = min_alpha
         self.vector_size = vector_size
         self.alpha = alpha
+        self.model = None
 
     def dev_autoencoder(self):
         tagged_data = [TaggedDocument(words=word_tokenize(_d.lower()), tags=[str(i)]) for i, _d in
@@ -24,11 +25,10 @@ class training_autoencoders(object):
         embedding_matrix = []
 
         for element in data_to_evaluate:
-            embedding = self.model.infer_vector(element)
+            embedding = self.model.infer_vector([element])
             row_data = [value for value in embedding]
             row_data.insert(0, element)
             embedding_matrix.append(row_data)
-
         header = ["p_{}".format(i) for i in range(self.vector_size)]
         header.insert(0, "word")
 

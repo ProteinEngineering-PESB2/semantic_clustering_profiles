@@ -43,16 +43,16 @@ class exploring_clustering(object):
     def __exploring_agglomerative_ks(self):
 
         for k in range(1, self.max_k_values+1):
-            for linkage in ['ward', 'complete', 'average', 'single']:
-                for affinity in ['euclidean', 'l1', 'l2', 'manhattan', 'cosine', 'precomputed']:
+            for linkage in ['ward', 'average']:
+                for affinity in ['euclidean']:
                     params = "linkage: {}-affinity: {}-k: {}".format(linkage, affinity, k)
                     response_apply = self.exploring_instance.aplicateAlgomerativeClustering(linkage, affinity, k)
                     self.__evaluate_algorithm("Agglomerative", response_apply, params, self.exploring_instance)
 
     def __exploring_optics(self):
 
-        for xi in [0, 0.01, 0.05, 0.1, 0.5, 1]:
-            for min_size in [0, 0.01, 0.05, 0.1, 0.5, 1]:
+        for xi in [0, 0.01]:
+            for min_size in [0, 0.01]:
                 params = "min_members: {}-xi: {}-min_size: {}".format(self.min_examples_per_group, xi, min_size)
                 response_apply = self.exploring_instance.applicateOptics(self.min_examples_per_group, xi, min_size)
                 self.__evaluate_algorithm("OPTICS", response_apply, params, self.exploring_instance)

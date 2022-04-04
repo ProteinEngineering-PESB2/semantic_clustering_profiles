@@ -11,6 +11,6 @@ path_export = sys.argv[2]
 index_list = [i for i in range(len(dataset))]
 dataset['index'] = index_list
 
-tfid_vectors_instance = tfid_vectors(dataset['word'], 'spanish', dataset['index'])
+tfid_vectors_instance = tfid_vectors(dataset['word'], 'english', dataset['index'])
 tfid_vectors_instance.apply_tfid_vectorization()
 
