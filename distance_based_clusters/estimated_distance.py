@@ -1,5 +1,4 @@
 import pandas as pd
-import sys
 from scipy.spatial import distance
 import time
 import os
@@ -79,7 +78,7 @@ class estimated_distance(object):
 
         print("Finish: ", os.getpid())
     
-    def paralelism_create_vector_distance(self, dataset, start, stop, record_vectors):
+    def parallelism_create_vector_distance(self, dataset, start, stop, record_vectors):
 
         for i in range(start, stop):#completo		
             vector1 = self.create_vector_values(dataset, i)
@@ -119,7 +118,8 @@ class estimated_distance(object):
                 print(start, stop)
 
                 #paralelize todos los vectores 01
-                processes_create_vectors.append(mp.Process(target=self.paralelism_create_vector_distance, args=[self.dataset, start, stop, record_vectors]))
+                tupe_arrays = tuple([self.dataset, start, stop, record_vectors])
+                processes_create_vectors.append(mp.Process(target=self.parallelism_create_vector_distance, args=tupe_arrays))
             
             #run and join data process	
             for p in processes_create_vectors:
