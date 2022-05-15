@@ -25,7 +25,6 @@ interface = interface()
 class api:
     @server.route('/api/alignment/', methods=["POST"])
     def api_alignment():
-        print(request)
         #Recieve either a fasta file or text. Interface will process and get data and bool variables. 
         data, is_json, is_file = interface.parse_information_no_options(request)
         align = alignment(data, temp_folder, static_folder, 
@@ -34,7 +33,7 @@ class api:
         if(align.check["status"] == "error"):
             return align.check
         #Get results and parse
-        dbs = ["swissprot", "pdbaa"]
+        dbs = ["swissprot", "pdbaa", "peptipedia"]
         response = {}
         for i in dbs:
             align.execute_blastp(i)
