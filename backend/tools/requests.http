@@ -1,0 +1,8 @@
+@api = http://190.114.255.125:8002/api
+
+POST {{api}}/alignment/
+Content-Type: application/json
+
+{
+    "data": ">sp|P40337|VHL_HUMAN von Hippel-Lindau disease tumor suppressor OS=Homo sapiens OX=9606 GN=VHL PE=1 SV=2\nMPRRAENWDEAEVGAEEAGVEEYGPEEDGGEESGAEESGPEESGPEELGAEEEMEAGRPR\nPVLRSVNSREPSQVIFCNRSPRVVLPVWLNFDGEPQPYPTLPPGTGRRIHSYRGHLWLFR"
+}
