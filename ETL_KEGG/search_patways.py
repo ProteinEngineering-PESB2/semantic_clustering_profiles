@@ -18,8 +18,9 @@ for i in range(len(dataset)):
         if len(element)>1:
             element = element.split("\t")
             values = [value.strip() for value in element]
+            values.insert(0, organism)
             matrix_pathways.append(values)
-
+    
 print("Exporting data")
-df_export = pd.DataFrame(matrix_pathways, columns=['path_id', 'description_path'])
+df_export = pd.DataFrame(matrix_pathways, columns=['organism', 'path_id', 'description_path'])
 df_export.to_csv(name_export, index=False)
