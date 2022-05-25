@@ -40,3 +40,4 @@ for i in range(3, 513):
     print("Export dataset")
     name_export = "{}{}_size\\{}_embedding_data.csv".format(path_export, i, random.randint(1, 1000)*100)
     dataset_embedding.to_csv(name_export, index=False)
+    
