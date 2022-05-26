@@ -17,7 +17,7 @@ for element in organisms:
         values = element.split("\t")
         values = [value.strip() for value in values]
         matrix_data.append(values)
-        
+
 print("Exporting results")
 df_export = pd.DataFrame(matrix_data, columns=['id_code', 'code', 'name_organism', 'description'])
 df_export.to_csv(name_export, index=False)
