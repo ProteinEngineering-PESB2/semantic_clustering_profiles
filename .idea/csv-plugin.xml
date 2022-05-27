@@ -3,13 +3,6 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="\ETL_KEGG\error_list_organism_found_pathwats.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
         <entry key="\ETL_KEGG\results\enzymes_list.csv">
           <value>
             <Attribute>
@@ -25,6 +18,27 @@
           </value>
         </entry>
         <entry key="\ETL_KEGG\results\pathways_list.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\ETL_KEGG\results\process_sequences_found_error.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\ETL_KEGG\results\sequences_found.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\ETL_KEGG\results\sequences_found_error.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
